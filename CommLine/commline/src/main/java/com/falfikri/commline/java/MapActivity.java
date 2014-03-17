@@ -1,7 +1,9 @@
 package com.falfikri.commline.java;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Criteria;
 import android.location.Location;
@@ -40,6 +42,26 @@ public class MapActivity extends Activity{
 
         overridePendingTransition(R.anim.fadein, R.anim.fadeout);
         super.onResume();
+    }
+
+    @Override
+    public void onBackPressed() {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MapActivity.this);
+
+        alertDialogBuilder.setTitle("Exiting App");
+        alertDialogBuilder.setMessage("Are you sure you want to exit?");
+        alertDialogBuilder.setPositiveButton("Yes, exit the app",new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog,int id) {
+                MapActivity.this.finish();
+            }
+        });
+        alertDialogBuilder.setNegativeButton("No",new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog,int id) {
+                dialog.cancel();
+            }
+        });
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
     }
 
     private void initializeMap(){
