@@ -53,6 +53,7 @@ public class MapActivity extends Activity{
         alertDialogBuilder.setPositiveButton("Yes, exit the app",new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog,int id) {
                 MapActivity.this.finish();
+                overridePendingTransition(R.anim.fadein, R.anim.fadeout);
             }
         });
         alertDialogBuilder.setNegativeButton("No",new DialogInterface.OnClickListener() {
