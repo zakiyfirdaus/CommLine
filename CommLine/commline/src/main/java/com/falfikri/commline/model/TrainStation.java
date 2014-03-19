@@ -3,6 +3,7 @@ package com.falfikri.commline.model;
 import android.location.Location;
 
 import com.falfikri.commline.util.LocationUtility;
+import com.google.android.gms.maps.model.LatLng;
 
 /**
  * Created by zakiy on 3/17/14.
@@ -31,6 +32,10 @@ public class TrainStation {
 
     public Location getLocation() {
         return mLocation;
+    }
+
+    public LatLng getLatLng(){
+        return LocationUtility.toLatLng(mLocation);
     }
 
     public void setLocation(Location mLocation) {
