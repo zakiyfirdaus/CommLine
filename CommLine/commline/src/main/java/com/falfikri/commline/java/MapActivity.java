@@ -14,13 +14,21 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.falfikri.commline.R;
+import com.falfikri.commline.model.TrainStation;
+import com.falfikri.commline.object.TrainStations;
+import com.falfikri.commline.util.LocationUtility;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by zakiy on 3/17/14.
@@ -28,6 +36,8 @@ import com.google.android.gms.maps.model.Marker;
 public class MapActivity extends Activity{
     private GoogleMap mGoogleMap;
     private Location mCurrentLocation;
+    private List<LatLng> mMarkersLatLngList;
+    private boolean mFirstLoad = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +49,6 @@ public class MapActivity extends Activity{
 
     @Override
     protected void onResume() {
-
         overridePendingTransition(R.anim.fadein, R.anim.fadeout);
         super.onResume();
     }
@@ -83,10 +92,12 @@ public class MapActivity extends Activity{
                 mGoogleMap.getUiSettings().setZoomControlsEnabled(true);
                 mGoogleMap.getUiSettings().setRotateGesturesEnabled(false);
                 mGoogleMap.setMyLocationEnabled(true);
+                initializeMarker();
 
                 LocationManager locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
 
                 Criteria cri= new Criteria();
+
                 String provider = locationManager.getBestProvider(cri, true);
                 mCurrentLocation = locationManager.getLastKnownLocation(provider);
                 LatLng currentLatLng;
@@ -120,8 +131,51 @@ public class MapActivity extends Activity{
 
                     }
                 });
-            }
 
+                mGoogleMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
+                    @Override
+                    public void onCameraChange(CameraPosition cameraPosition) {
+                        if(mFirstLoad){
+                            mFirstLoad = false;
+                            zoomToContainAllMarkers();
+                        }
+                    }
+                });
+            }
+        }
+    }
+
+    private void initializeMarker(){
+        mMarkersLatLngList = new ArrayList<LatLng>();
+        List<TrainStation> trainStations = TrainStations.getBogorSudirmanStations();
+        if(trainStations.size()>0){
+            LatLng currentLatLng = new LatLng(0,0);
+            for(TrainStation trainStation:trainStations){
+                mMarkersLatLngList.add(trainStation.getLatLng());
+                mGoogleMap.addMarker(new MarkerOptions()
+                        .position(trainStation.getLatLng())
+                        .title(trainStation.getName())
+                        .snippet("")
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE))
+                        //.icon(BitmapDescriptorFactory.fromResource(R.drawable.ico_bitcoin_loc))
+                ).showInfoWindow();
+            }
+        }
+
+//        zoomToContainAllMarkers();
+    }
+
+    private void zoomToContainAllMarkers() {
+        if(mMarkersLatLngList.size()>0){
+            LatLngBounds.Builder bc = new LatLngBounds.Builder();
+            for (LatLng item : mMarkersLatLngList) {
+                bc.include(item);
+            }
+            try{
+                mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bc.build(), 50));
+            } catch(Exception e){
+                e.printStackTrace();
+            }
         }
     }
 }
