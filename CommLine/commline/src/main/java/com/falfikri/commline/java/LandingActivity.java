@@ -20,7 +20,7 @@ public class LandingActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_landing);
         overridePendingTransition(R.anim.fadein, R.anim.fadeout);
-        int timeout = 1000;
+        int duration = 1000;
         Handler handler = new Handler();
         handler.postDelayed(new Runnable()
         {
@@ -30,7 +30,7 @@ public class LandingActivity extends Activity {
                 startActivity(intent);
                 finish();
             }
-        }, timeout );
+        }, duration);
     }
 
     @Override
